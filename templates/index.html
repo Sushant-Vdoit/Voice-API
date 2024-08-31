@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time TTS Streaming</title>
+</head>
+<body>
+    <h1>Real-Time Text-to-Speech Streaming</h1>
+    <textarea id="text-input" placeholder="Enter text here..."></textarea><br>
+    <button id="start-btn">Start TTS</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        document.getElementById('start-btn').onclick = () => {
+            const text = document.getElementById('text-input').value;
+            socket.emit('tts', { text: text });
+        };
+
+        let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let source;
+
+        socket.on('audio_chunk', (chunk) => {
+            let audioBuffer = new Uint8Array(chunk).buffer;
+            audioContext.decodeAudioData(audioBuffer, (buffer) => {
+                if (source) {
+                    source.stop();
+                }
+                source = audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioContext.destination);
+                source.start(0);
+            });
+        });
+
+        socket.on('error', (data) => {
+            alert(data.message);
+        });
+    </script>
+</body>
+</html>
