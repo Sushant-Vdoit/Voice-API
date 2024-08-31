@@ -1,5 +1,5 @@
-python
-openai
-socketio
-flask
-wave
+Flask==3.0.3
+flask-socketio==5.3.6
+openai==1.42.0
+python-dotenv==1.0.1
+gunicorn==23.0.0
