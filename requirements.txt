@@ -1,0 +1,5 @@
+python
+openai
+socketio
+flask
+wave
