@@ -6,6 +6,7 @@ import wave
 import openai
 import time
 import os
+import json
 
 load_dotenv()
 
@@ -35,13 +36,16 @@ def index():
 
 @app.route('/tts', methods=['POST'])
 def tts_post():
-    # Get raw text data from the request body
-    text = request.get_data(as_text=True)
+    # Expecting the body to contain raw JSON text
+    try:
+        text = json.loads(request.data)
+    except json.JSONDecodeError:
+        return {"error": "Invalid JSON format"}, 400
     
-    if not text:
-        return {"error": "No text provided"}, 400
+    if not isinstance(text, str) or not text:
+        return {"error": "No valid text provided"}, 400
 
-    # Split the text into sentences (e.g., split by period)
+    # Split the text into sentences
     sentences = text.split('. ')
     all_chunks = []
 
